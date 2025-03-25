@@ -1,0 +1,129 @@
+<link rel="stylesheet" href="index.css">
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>To Do:</title>
+    </head>
+
+    <body>
+        <div class="title">
+            <h1>To Do List</h1>
+        </div>
+
+        <form id="form">
+            <label for="task">Task:</label>
+            <input type="text" id="task" name="task" onkeypress="enter(event)" />
+            <button type="button" id="submitButton" onclick="inputtask()">Submit</button>
+
+            <!-- <p>Color: </p> -->
+            <label class="switch">
+                <input type="checkbox" id="colorSwitch">
+                <span class="slider round"></span>
+            </label>
+            <button type="button" id="clearButton" onclick="cleartasks()">Delete All Tasks</button>
+
+
+            <div class="todoContainer"></div>
+
+            <script>
+                let tasks = [];
+                let taskId = 0;
+                var text = document.getElementById("task");
+                var submitButton = document.getElementById("submitButton");
+                const toggleSwitch = document.getElementById("colorSwitch");
+                let color = false;
+
+                function enter(event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        console.log("Key pressed");
+                        submitButton.click();
+                    }
+                }
+
+                function cleartasks() {
+                    tasks = [];
+                    printtasks();
+                }
+
+                function inputtask() {
+                    console.log("in function");
+                    const taskValue = document.getElementById("task").value.trim();
+                    if (!taskValue) return;
+
+                    // tasks.push(taskValue);
+                    tasks.push({id: taskId, text: taskValue, checked: false});
+                    taskId += 1;
+                    console.log(tasks);
+
+                    document.getElementById('task').value = '';
+                    printtasks();
+                };
+
+                function printtasks() {
+                    const taskBoxes = document.querySelectorAll('.task-box');
+                    taskBoxes.forEach(taskBox => {
+                        console.log("in loop");
+                        const checkbox = taskBox.querySelector('.checkbox');
+                        
+                        if (checkbox && checkbox.checked) {
+                            console.log('This task is checked:', taskBox.getAttribute("data-id"));
+                            let tempID = taskBox.getAttribute("data-id");
+                            tasks.forEach(task => {
+                                if (task.id == tempID) {
+                                    task.checked = true
+                                    console.log("task array changed");
+                                }
+                            });
+                        }
+                        else if (checkbox && !checkbox.checked) {
+                            let tempID = taskBox.getAttribute("data-id");
+                            tasks.forEach(task => {
+                                if (task.id == tempID) {
+                                    task.checked = false
+                                }
+                            })
+                        }
+                    });
+
+                    const ct = document.querySelector('.todoContainer');
+                    ct.innerHTML = '';
+                    const newHTML = tasks.map(task =>
+                                                    `<div class="task-box" data-id="${task.id}">
+                                                        <div class="task-info">
+                                                            <input type="checkbox" class="checkbox" ${task.checked ? "checked" : ""}>
+                                                            <label> ${task.text} </label>
+                                                        </div>
+
+                                                        <button class="deleteButton">Delete</button>
+                                                    </div>`).join('');
+                    ct.insertAdjacentHTML('beforeend', newHTML);
+                }
+
+                document.querySelector('.todoContainer').addEventListener("click", function (event) {
+                    if (event.target.classList.contains("deleteButton")) {
+                        const taskBox = event.target.closest('.task-box');
+                        const delTaskId = Number(taskBox.getAttribute("data-id"));
+                        console.log(delTaskId)
+
+                        tasks = tasks.filter(task => task.id !== delTaskId);
+
+                        printtasks();
+                    }
+                });
+
+                toggleSwitch.addEventListener("change", function () {
+                    if (this.checked) {
+                        color = true
+                    } else {
+                        color = false
+                    }
+                    printtasks();
+                });
+            </script>
+        </form>
+        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0kThmY7A0ynir2qLWFFhrY?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </body>
+</html>
